@@ -1,0 +1,123 @@
+image: docker:latest
+services:
+  - name: docker:dind
+    alias: docker
+
+variables:
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+  CONTAINER_NAME: $CI_PROJECT_NAME
+
+stages:
+  - Build image
+  - Acceptance test
+  - Release image
+  - Deploy review
+  - Stop review
+  - Deploy staging
+  - Test staging
+  - Deploy prod
+  - Test prod
+
+.heroku_deployment: &heroku
+  environment:
+    name: $ENV
+    url: https://static-website-$ENV.herokuapp.com
+  script:
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku create $CONTAINER_NAME-$ENV || echo "existant project name"
+    - heroku container:push -a $CONTAINER_NAME-$ENV web
+    - heroku container:release -a $CONTAINER_NAME-$ENV web
+
+.test_template: &test
+  image: alpine
+  only:
+    - master
+  script:
+    - apk --no-cache add curl
+    - curl "https://$CONTAINER_NAME-$ENV.herokuapp.com"
+
+build:
+  # Official docker image
+  stage: Build image
+  script:
+    - docker build -t static-website.img .
+    - docker save static-website.img > static-website.img.tar
+  artifacts:
+    paths:
+      - static-website.img.tar
+
+test:
+  stage: Acceptance test
+  script:
+    - docker load < static-website.img.tar
+    - docker run -d -p 8080:80 --name static-website static-website.img
+    - sleep 5
+    - apk --no-cache add curl
+    - curl "http://docker:8080" | grep -q "Dimension"
+
+release:
+  stage: Release image
+  script:
+    - docker load < static-website.img.tar
+    - docker image tag static-website.img "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - docker image tag static-website.img "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+staging:
+  <<: *heroku
+  stage: Deploy staging
+  only:
+    - master
+  variables:
+    ENV: staging
+
+test staging:
+  <<: *test
+  stage: Test staging
+  variables:
+    ENV: staging
+
+prod:
+  <<: *heroku
+  stage: Deploy prod
+  only:
+    - master
+  variables:
+    ENV: prod
+
+test prod:
+  <<: *test
+  stage: Test prod
+  variables:
+    ENV: prod
+
+review:
+  <<: *heroku
+  stage: Deploy review
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop review
+  only:
+    - merge_requests
+  variables:
+    ENV: $CI_COMMIT_REF_NAME
+
+stop review:
+  stage: Stop review
+  variables:
+    GIT_STRATEGY: none
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  only:
+    - merge_requests
+  when: manual
+  script:
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku apps:destroy -a $CONTAINER_NAME-$CI_COMMIT_REF_NAME --confirm $CONTAINER_NAME-$CI_COMMIT_REF_NAME
