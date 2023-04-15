@@ -10,7 +10,7 @@ Contexte : formation Bootcamp DevOps promotion 12
 
 Centre de formation : eazytraining.fr
 
-Période : mars-apvil-mai
+Période : mars-avril-mai
 
 Date : 15 avril 2023
 
