@@ -1,0 +1,69 @@
+# GitLab CI Mini-Project
+
+In this project, I containerized an existing static web application and set up a CI/CD pipeline on GitLab to automate the steps of building, testing, and deploying the application on Heroku. This README explains the pipeline stages, the choices made when writing the code in the `.gitlab-ci.yml` file, and the advantages of this approach.
+
+---
+
+Author: Abdel-had HANAMI
+
+Context: Bootcamp DevOps training, 12th promotion
+
+Training center: eazytraining.fr
+
+Period: March-April-May
+
+Date: April 15, 2023
+
+LinkedIn : https://www.linkedin.com/in/abdel-had-hanami/
+
+---
+
+## Overview of the CI/CD Pipeline
+
+The CI/CD pipeline I set up includes the following stages:
+
+1. **Build image**: Build the Docker image using the Dockerfile I created.
+2. **Acceptance test**: Run acceptance tests on the built Docker image.
+3. **Release image**: Publish the Docker image to the GitLab registry.
+4. **Deploy review**: Deploy the application in a review environment on Heroku (for merge requests).
+5. **Stop review**: Stop the review environment on Heroku.
+6. **Deploy staging**: Deploy the application in a staging environment on Heroku.
+7. **Test staging**: Run tests on the staging environment.
+8. **Deploy prod**: Deploy the application in the production environment on Heroku.
+9. **Test prod**: Run tests on the production environment.
+
+## Detailed Pipeline Explanation
+
+### Build image
+
+I created a Dockerfile to build a Docker image containing the static web application and the HTTP server. I used a multi-stage approach to reduce the final image size and improve build times. Advantages of this approach include a clear separation of concerns (cloning the repository, copying the source code) and reducing the final image size by including only the necessary files.
+
+### Acceptance test
+
+In this stage, acceptance tests are run on the built Docker image. The image is loaded from the artifact `static-website.img.tar`, then run as a container. The service is tested by performing an HTTP request and checking for specific content ("Dimension") in the response.
+
+### Release image
+
+Here, the Docker image is published to the GitLab registry. The image is first loaded from the artifact `static-website.img.tar`, then tagged with the branch name and commit SHA. It is then pushed to the registry. This allows keeping track of images for each commit and branch, making version tracking and deployment management easier.
+
+### Deploy review, staging, and prod
+
+I set up deployment stages for different environments (review, staging, and production) on Heroku. These stages ensure that the application is properly tested and verified before being deployed to production. The deployment stages use environment variables to differentiate environments and ensure the correct configurations are applied.
+
+### Stop review
+
+The "Stop review" stage is designed to stop and remove the review environment on Heroku when it is no longer needed. This frees up resources and keeps deployment environments clean.
+
+### Test staging and Test prod
+
+After each deployment to staging and production environments, I added stages to test the deployed application. This ensures the application is working correctly in the target environment before being considered ready for production use.
+
+## Technologies Used
+
+- Docker: For containerizing the application and simplifying deployment.
+- GitLab CI/CD: For automating the steps of building, testing, and deploying the application.
+- Heroku: For hosting the application in different environments (review, staging, and production).
+
+## Conclusion
+
+By setting up this CI/CD pipeline for the static web application, I was able to automate the processes of building, testing, and deploying while ensuring the application is properly tested and functional before being put into production. Using Docker and GitLab CI/CD facilitated the management of environments and deployments, providing an efficient and reliable way to update and maintain the application.
