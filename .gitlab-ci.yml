@@ -1,12 +1,17 @@
+# Spécifie l'image Docker à utiliser pour les tâches
 image: docker:latest
+
+# Définit un service Docker utilisé pour exécuter des commandes Docker
 services:
   - name: docker:dind
     alias: docker
 
+# Définit des variables globales pour le pipeline
 variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   CONTAINER_NAME: $CI_PROJECT_NAME
 
+# Énumère les étapes du pipeline
 stages:
   - Build image
   - Acceptance test
@@ -18,6 +23,7 @@ stages:
   - Deploy prod
   - Test prod
 
+# Crée un modèle de déploiement Heroku
 .heroku_deployment: &heroku
   environment:
     name: $ENV
@@ -30,6 +36,7 @@ stages:
     - heroku container:push -a $CONTAINER_NAME-$ENV web
     - heroku container:release -a $CONTAINER_NAME-$ENV web
 
+# Crée un modèle de test
 .test_template: &test
   image: alpine
   only:
@@ -38,8 +45,8 @@ stages:
     - apk --no-cache add curl
     - curl "https://$CONTAINER_NAME-$ENV.herokuapp.com"
 
+# Construit l'image Docker
 build:
-  # Official docker image
   stage: Build image
   script:
     - docker build -t static-website.img .
@@ -48,6 +55,7 @@ build:
     paths:
       - static-website.img.tar
 
+# Teste l'image Docker
 test:
   stage: Acceptance test
   script:
@@ -57,6 +65,7 @@ test:
     - apk --no-cache add curl
     - curl "http://docker:8080" | grep -q "Dimension"
 
+# Publie l'image Docker
 release:
   stage: Release image
   script:
@@ -67,6 +76,7 @@ release:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
+# Déploie l'application sur l'environnement de staging
 staging:
   <<: *heroku
   stage: Deploy staging
@@ -75,12 +85,14 @@ staging:
   variables:
     ENV: staging
 
+# Teste l'application sur l'environnement de staging
 test staging:
   <<: *test
   stage: Test staging
   variables:
     ENV: staging
 
+# Déploie l'application sur l'environnement de production
 prod:
   <<: *heroku
   stage: Deploy prod
@@ -89,12 +101,14 @@ prod:
   variables:
     ENV: prod
 
+# Teste l'application sur l'environnement de production
 test prod:
   <<: *test
   stage: Test prod
   variables:
     ENV: prod
 
+# Déploie l'application pour une revue (review app)
 review:
   <<: *heroku
   stage: Deploy review
@@ -106,6 +120,7 @@ review:
   variables:
     ENV: $CI_COMMIT_REF_NAME
 
+# Arrête l'application de revue (review app)
 stop review:
   stage: Stop review
   variables:
