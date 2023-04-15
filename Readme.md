@@ -58,6 +58,12 @@ L'étape "Stop review" est conçue pour arrêter et supprimer l'environnement de
 
 Après chaque déploiement dans les environnements staging et production, j'ai ajouté des étapes pour tester l'application déployée. Cela garantit que l'application fonctionne correctement dans l'environnement cible avant d'être considérée comme prête pour une utilisation en production.
 
+## Aperçu du site
+
+
+![webapp](images/webapp.png "webapp")
+
+
 ## Technologies utilisées
 
 - Docker : Pour conteneuriser l'application et faciliter son déploiement.
