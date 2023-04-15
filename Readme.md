@@ -39,7 +39,7 @@ Le pipeline CI/CD que j'ai mis en place comprend les étapes suivantes :
 J'ai créé un Dockerfile pour construire une image Docker contenant l'application web statique et le serveur HTTP. J'ai utilisé une approche multi-stage pour réduire la taille de l'image finale et améliorer les temps de construction. Les avantages de cette approche incluent une séparation claire des préoccupations (clonage du dépôt, copie du code source) et une réduction de la taille de l'image finale en n'incluant que les fichiers nécessaires.
 
 ### Acceptance test
-
+ 
 Dans cette étape, des tests d'acceptation sont exécutés sur l'image Docker construite. L'image est chargée à partir de l'artefact `static-website.img.tar`, puis exécutée en tant que conteneur. Le service est testé en effectuant une requête HTTP et en vérifiant la présence d'un contenu spécifique ("Dimension") dans la réponse.
 
 ### Release image
