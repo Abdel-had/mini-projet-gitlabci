@@ -59,6 +59,12 @@ The "Stop review" stage is designed to stop and remove the review environment on
 
 After each deployment to staging and production environments, I added stages to test the deployed application. This ensures the application is working correctly in the target environment before being considered ready for production use.
 
+## Overview of the website
+
+
+![webapp](images/webapp.png "webapp")
+
+
 ## Technologies Used
 
 - Docker: For containerizing the application and simplifying deployment.
