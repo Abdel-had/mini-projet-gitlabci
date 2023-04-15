@@ -17,7 +17,7 @@ Date : 15 avril 2023
 LinkedIn : https://www.linkedin.com/in/abdel-had-hanami/
 
 ## Aperçu du pipeline CI/CD
----
+
 ![pipeline ci/cd](images/pipeline-ci-cd.jpeg "pipeline ci/cd")
 
 Le pipeline CI/CD que j'ai mis en place comprend les étapes suivantes :
