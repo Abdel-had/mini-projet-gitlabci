@@ -1,6 +1,6 @@
 # Mini-projet GitLab CI
 
-Dans ce projet, j'ai conteneurisé une application web statique existante et mis en place un pipeline de CI/CD sur GitLab pour automatiser les étapes de construction, de test et de déploiement de l'application sur Heroku. Ce rapport explique les étapes du pipeline, les choix de rédaction du code dans le fichier `.gitlab-ci.yml`, et les avantages de cette approche.
+Dans ce projet, j'ai conteneurisé une application web statique existante et mis en place un pipeline de CI/CD sur GitLab pour automatiser les étapes de construction, de test et de déploiement de l'application sur Heroku. Ce rapport explique les étapes du pipeline que vous trouverez dans le fichier `.gitlab-ci.yml`, et les avantages de cette approche.
 
 ---
 
