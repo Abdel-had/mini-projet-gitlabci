@@ -20,17 +20,51 @@ LinkedIn : https://www.linkedin.com/in/abdel-had-hanami/
 
 ![pipeline ci/cd](images/pipeline-ci-cd.jpeg "pipeline ci/cd")
 
-Le pipeline CI/CD que j'ai mis en place comprend les étapes suivantes :
 
-1. **Build image** : Construit l'image Docker en utilisant le Dockerfile que j'ai créé.
-2. **Acceptance test** : Exécute des tests d'acceptation sur l'image Docker construite.
-3. **Release image** : Publie l'image Docker dans le registre de GitLab.
-4. **Deploy review** : Déploie l'application dans un environnement de révision sur Heroku (pour les merge requests).
-5. **Stop review** : Arrête l'environnement de révision sur Heroku.
-6. **Deploy staging** : Déploie l'application dans un environnement de préproduction (staging) sur Heroku.
-7. **Test staging** : Exécute des tests sur l'environnement de préproduction.
-8. **Deploy prod** : Déploie l'application dans l'environnement de production sur Heroku.
-9. **Test prod** : Exécute des tests sur l'environnement de production.
+## Workflow du Pipeline CI/CD avec Conditions d'Exécution
+
+1. **Build image**
+   - *Condition* : S'exécute pour chaque commit.
+   - Construit l'image Docker en utilisant le Dockerfile que j'ai créé.
+   - Utilise une approche multi-stage pour réduire la taille de l'image finale et améliorer les temps de construction.
+   
+2. **Acceptance test**
+   - *Condition* : S'exécute pour chaque commit.
+   - Exécute des tests d'acceptation sur l'image Docker construite.
+   - Charge l'image à partir de l'artefact `static-website.img.tar`, puis exécute le conteneur.
+   - Teste le service en effectuant une requête HTTP et en vérifiant la présence d'un contenu spécifique dans la réponse.
+
+3. **Release image**
+   - *Condition* : S'exécute pour chaque commit.
+   - Publie l'image Docker dans le registre de GitLab.
+   - Charge l'image à partir de l'artefact `static-website.img.tar`, puis la tag avec le nom de la branche et le commit SHA.
+   - Pousse l'image dans le registre de GitLab pour garder une trace des images pour chaque commit et branche.
+
+4. **Deploy review**
+   - *Condition* : S'exécute pour chaque nouvelle merge request ou mise à jour d'une merge request existante.
+   - Déploie l'application dans un environnement de révision sur Heroku (pour les merge requests).
+   
+5. **Stop review**
+   - *Condition* : S'exécute lorsqu'une merge request est fermée ou acceptée.
+   - Arrête l'environnement de révision sur Heroku pour libérer des ressources et garder les environnements de déploiement propres.
+
+6. **Deploy staging**
+   - *Condition* : S'exécute lorsqu'un commit est poussé sur la branche `main` ou `master`.
+   - Déploie l'application dans un environnement de préproduction (staging) sur Heroku.
+   
+7. **Test staging**
+   - *Condition* : S'exécute après le déploiement réussi dans l'environnement de préproduction.
+   - Exécute des tests sur l'environnement de préproduction pour s'assurer que l'application fonctionne correctement.
+   
+8. **Deploy prod**
+   - *Condition* : S'exécute manuellement après validation des tests de préproduction.
+   - Déploie l'application dans l'environnement de production sur Heroku.
+   
+9. **Test prod**
+   - *Condition* : S'exécute après le déploiement réussi dans l'environnement de production.
+   - Exécute des tests sur l'environnement de production pour garantir le bon fonctionnement de l'application.
+
+
 
 ## Explications détaillées du pipeline
 
