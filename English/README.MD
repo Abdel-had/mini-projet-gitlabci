@@ -21,17 +21,50 @@ LinkedIn : https://www.linkedin.com/in/abdel-had-hanami/
 
 ![pipeline ci/cd](../images/pipeline-ci-cd.jpeg "pipeline ci/cd")
 
-The CI/CD pipeline I set up includes the following stages:
 
-1. **Build image**: Build the Docker image using the Dockerfile I created.
-2. **Acceptance test**: Run acceptance tests on the built Docker image.
-3. **Release image**: Publish the Docker image to the GitLab registry.
-4. **Deploy review**: Deploy the application in a review environment on Heroku (for merge requests).
-5. **Stop review**: Stop the review environment on Heroku.
-6. **Deploy staging**: Deploy the application in a staging environment on Heroku.
-7. **Test staging**: Run tests on the staging environment.
-8. **Deploy prod**: Deploy the application in the production environment on Heroku.
-9. **Test prod**: Run tests on the production environment.
+## CI/CD Pipeline Workflow with Execution Conditions
+
+1. **Build image**
+   - *Condition*: Executes for each commit.
+   - Builds the Docker image using the Dockerfile I created.
+   - Uses a multi-stage approach to reduce the final image size and improve build times.
+   
+2. **Acceptance test**
+   - *Condition*: Executes for each commit.
+   - Runs acceptance tests on the built Docker image.
+   - Loads the image from the `static-website.img.tar` artifact, then runs the container.
+   - Tests the service by making an HTTP request and checking for specific content in the response.
+
+3. **Release image**
+   - *Condition*: Executes for each commit.
+   - Publishes the Docker image to the GitLab registry.
+   - Loads the image from the `static-website.img.tar` artifact, then tags it with the branch name and commit SHA.
+   - Pushes the image to the GitLab registry to keep track of images for each commit and branch.
+
+4. **Deploy review**
+   - *Condition*: Executes for each new merge request or update to an existing merge request.
+   - Deploys the application to a review environment on Heroku (for merge requests).
+   
+5. **Stop review**
+   - *Condition*: Executes when a merge request is closed or accepted.
+   - Stops the review environment on Heroku to free up resources and keep deployment environments clean.
+
+6. **Deploy staging**
+   - *Condition*: Executes when a commit is pushed to the `main` or `master` branch.
+   - Deploys the application to a pre-production (staging) environment on Heroku.
+   
+7. **Test staging**
+   - *Condition*: Executes after successful deployment to the pre-production environment.
+   - Runs tests on the pre-production environment to ensure the application is working correctly.
+   
+8. **Deploy prod**
+   - *Condition*: Executes manually after pre-production test validation.
+   - Deploys the application to the production environment on Heroku.
+   
+9. **Test prod**
+   - *Condition*: Executes after successful deployment to the production environment.
+   - Runs tests on the production environment to ensure the application is functioning properly.
+
 
 ## Detailed Pipeline Explanation
 
@@ -62,7 +95,7 @@ After each deployment to staging and production environments, I added stages to 
 ## Overview of the website
 
 
-![webapp](images/webapp.png "webapp")
+![webapp](../images/webapp.png "webapp")
 
 
 ## Technologies Used
