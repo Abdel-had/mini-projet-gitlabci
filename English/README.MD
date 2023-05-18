@@ -1,5 +1,7 @@
 # GitLab CI Mini-Project
 
+![pipeline ci/cd](../images/pipeline-ci-cd.jpeg "pipeline ci/cd")
+
 In this project, I containerized an existing static web application and set up a CI/CD pipeline on GitLab to automate the steps of building, testing, and deploying the application on Heroku. This README explains the pipeline stages, that you can find in the `.gitlab-ci.yml` file, and the advantages of this approach.
 
 ---
@@ -18,9 +20,7 @@ LinkedIn : https://www.linkedin.com/in/abdel-had-hanami/
 
 ## Overview of the CI/CD Pipeline
 
-
-![pipeline ci/cd](../images/pipeline-ci-cd.jpeg "pipeline ci/cd")
-
+![pipeline ci/cd](../images/Gitlab-CI_pipeline.png "pipeline ci/cd")
 
 ## CI/CD Pipeline Workflow with Execution Conditions
 
